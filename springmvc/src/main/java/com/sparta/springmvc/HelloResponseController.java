@@ -4,6 +4,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
 @RequestMapping("/hello/response")
 public class HelloResponseController {
@@ -76,7 +79,19 @@ public class HelloResponseController {
 // {"name":"BTS","age":28}
     @GetMapping("/json/class")
     @ResponseBody
-    public Star helloJson() {
-        return new Star("BTS", 28);
+    public List<Star> helloJson() {
+        List<Star> rList = new ArrayList<>();
+        Star star = new Star();
+        star.setName("이재훈");
+        star.setAge(20);
+        rList.add(star);
+        star = null;
+        star = new Star();
+        star.setName("BTS");
+        star.setAge(10);
+        rList.add(star);
+        star = null;
+
+        return rList;
     }
 }

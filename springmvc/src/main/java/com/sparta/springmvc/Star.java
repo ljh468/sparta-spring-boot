@@ -10,4 +10,7 @@ import lombok.Setter;
 public class Star {
     String name;
     int age;
+
+    public Star() {
+    }
 }
