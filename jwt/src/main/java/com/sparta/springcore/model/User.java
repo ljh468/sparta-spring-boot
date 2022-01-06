@@ -35,7 +35,6 @@ public class User {
     @Column(unique = true)
     private Long kakaoId;
 
-    // 일반 사용자를 위한 생성자
     public User(String username, String password, String email, UserRoleEnum role) {
         this.username = username;
         this.password = password;
