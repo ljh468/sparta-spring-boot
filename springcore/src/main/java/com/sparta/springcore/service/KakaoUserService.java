@@ -8,6 +8,7 @@ import com.sparta.springcore.model.User;
 import com.sparta.springcore.model.UserRoleEnum;
 import com.sparta.springcore.repository.UserRepository;
 import com.sparta.springcore.security.UserDetailsImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -23,8 +24,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class KakaoUserService {
     private final PasswordEncoder passwordEncoder;
@@ -113,26 +116,37 @@ public class KakaoUserService {
     private User registerKakaoUserIfNeeded(KakaoUserInfoDto kakaoUserInfo) {
         // DB 에 중복된 Kakao Id 가 있는지 확인
         Long kakaoId = kakaoUserInfo.getId();
+        log.info("kakaoId : " + kakaoId);
         // 카카오 ID가 있는지 확인 ( 없으면 null )
         User kakaoUser = userRepository.findByKakaoId(kakaoId)
                 .orElse(null);
 
         if (kakaoUser == null) {
-            // 회원가입
-            // username: kakao nickname
-            String nickname = kakaoUserInfo.getNickname();
+            String kakaoEmail = kakaoUserInfo.getEmail();
+            // 동일 Email을 가진 기존 회원이 존재하면 병합
+            User sameEmailUser = userRepository.findByEmail(kakaoEmail)
+                    .orElse(null);
+            if(sameEmailUser != null){
+                log.info("sameEmailUser.getKakaoId : " + sameEmailUser.getKakaoId());
+                kakaoUser = sameEmailUser;
+                // 기존 회원정보에 카카오 Id 추가
+                kakaoUser.setKakaoId(kakaoId);
+            } else{ // 동일 Email이 없으면
+                // 회원가입
+                // username: kakao nickname
+                String nickname = kakaoUserInfo.getNickname();
 
-            // password: random UUID
-            String password = UUID.randomUUID().toString();
-            String encodedPassword = passwordEncoder.encode(password);
+                // password: random UUID
+                String password = UUID.randomUUID().toString();
+                String encodedPassword = passwordEncoder.encode(password);
 
-            // email: kakao email
-            String email = kakaoUserInfo.getEmail();
-            // role: 일반 사용자
-            UserRoleEnum role = UserRoleEnum.USER;
+                // email: kakao email
+                String email = kakaoUserInfo.getEmail();
 
-            kakaoUser = new User(nickname, encodedPassword, email, role, kakaoId);
-
+                // role: 일반 사용자
+                UserRoleEnum role = UserRoleEnum.USER;
+                kakaoUser = new User(nickname, encodedPassword, email, role, kakaoId);
+            }
             userRepository.save(kakaoUser);
         }
         return kakaoUser;

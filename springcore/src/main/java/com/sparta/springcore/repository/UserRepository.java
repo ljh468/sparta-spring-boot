@@ -11,4 +11,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // 카카오 ID 중복확인
     Optional<User> findByKakaoId(Long kakaoId);
+
+    // 카카오 이메일 중복확인
+    Optional<User> findByEmail(String email);
+
 }
