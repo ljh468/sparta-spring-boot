@@ -24,12 +24,18 @@ public class ApiUseTime {
     @Column(nullable = false)
     private Long totalTime;
 
+    @Column(nullable = false, columnDefinition = "bigint default 0")
+    private Long totalCount;
+
     public ApiUseTime(User user, Long totalTime) {
         this.user = user;
         this.totalTime = totalTime;
+        this.totalCount = 1L;
     }
 
     public void addUseTime(long useTime) {
         this.totalTime += useTime;
+        this.totalCount += 1L;
+
     }
 }
