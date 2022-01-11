@@ -15,13 +15,11 @@ public class UserController {
     private final UserService userService;
     private final KakaoUserService kakaoUserService;
 
+    @Autowired
     public UserController(UserService userService, KakaoUserService kakaoUserService) {
         this.userService = userService;
         this.kakaoUserService = kakaoUserService;
     }
-
-    @Autowired
-
 
     // 회원 로그인 페이지
     @GetMapping("/user/login")
